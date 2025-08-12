@@ -2,12 +2,12 @@ import { Controller, Post, Body, HttpCode } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiOperation, ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { LoginUserDto } from './dto/login.dto';
+import { CreateUserDto } from 'src/users/dto/create-user.dto';
 
+@ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
-
-  @ApiTags('Authentication')
   @Post('login')
   @HttpCode(200)
   @ApiOperation({ summary: 'User login' })
@@ -34,5 +34,28 @@ export class AuthController {
   @ApiResponse({ status: 400, description: 'Bad request' })
   login(@Body() loginRequest: LoginUserDto) {
     return this.authService.login(loginRequest);
+  }
+
+  @ApiTags('Authentication')
+  @Post('register')
+  @ApiOperation({ summary: 'User registration' })
+  @ApiBody({ type: CreateUserDto })
+  @ApiResponse({
+    status: 201,
+    description: 'Registration successful',
+    schema: {
+      example: {
+        user: {
+          id: 1,
+          fullName: 'John Doe',
+          email: 'john@gmail.com',
+          roles: 'PATIENT',
+        },
+      },
+    },
+  })
+  @ApiResponse({ status: 409, description: 'User already exists' })
+  register(@Body() createUserDto: CreateUserDto) {
+    return this.authService.register(createUserDto);
   }
 }

@@ -1,4 +1,5 @@
 import {
+  ConflictException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -9,6 +10,8 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { CreateUserDto } from 'src/users/dto/create-user.dto';
+import { UserRole } from 'src/util/role.enum';
 
 @Injectable()
 export class AuthService {
@@ -50,6 +53,34 @@ export class AuthService {
       access_token: this.jwtService.sign(payload, {
         secret: process.env.JWT_SECRET,
       }),
+    };
+  }
+
+  async register(
+    createUserDto: CreateUserDto,
+  ): Promise<{ user: Partial<User> }> {
+    const existingUser = await this.userRepository.findOne({
+      where: { email: createUserDto.email },
+    });
+
+    if (existingUser) {
+      throw new ConflictException('User already exists');
+    }
+
+    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+    const user = this.userRepository.create({
+      ...createUserDto,
+      roles: createUserDto.roles || UserRole.PATIENT,
+      password: hashedPassword,
+    });
+
+    const savedUser = await this.userRepository.save(user);
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...userWithoutPassword } = savedUser;
+
+    return {
+      user: userWithoutPassword,
     };
   }
 }
