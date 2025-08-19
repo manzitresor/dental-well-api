@@ -1,4 +1,4 @@
-import { Controller, Get, Param, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
@@ -18,7 +18,7 @@ export class UsersController {
   @ApiOperation({ summary: 'Return a specific User' })
   @ApiResponse({ status: 200, description: 'Returns a single user.' })
   @ApiResponse({ status: 404, description: 'User not found.' })
-  findOne(@Param('id', ParseIntPipe) id: number) {
+  findOne(@Param('id') id: string) {
     return this.usersService.findOne(id);
   }
 }
