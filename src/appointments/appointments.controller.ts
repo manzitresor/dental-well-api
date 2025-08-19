@@ -4,7 +4,6 @@ import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { RequestWithUser } from 'src/auth/types/request-with-user';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { Appointment } from './entities/appointment.entity';
 
 @ApiTags('Appointments')
 @Controller('appointments')
