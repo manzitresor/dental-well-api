@@ -11,17 +11,20 @@ export class Appointment {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'date' })
+  @Column()
   date: string;
 
-  @Column({ type: 'time' })
+  @Column()
   time: string;
 
-  @Column({ type: 'varchar', length: 255 })
+  @Column()
   service: string;
 
-  @Column({ type: 'text', nullable: true })
+  @Column()
   notes?: string;
+
+  @Column()
+  status: string;
 
   @CreateDateColumn()
   createdAt: Date;
