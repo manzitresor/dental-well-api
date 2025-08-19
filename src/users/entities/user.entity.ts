@@ -2,16 +2,18 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { UserRole } from 'src/util/role.enum';
 import { Exclude } from 'class-transformer';
+import { Appointment } from 'src/appointments/entities/appointment.entity';
 
 @Entity()
 export class User {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column()
   fullName: string;
@@ -28,6 +30,9 @@ export class User {
 
   @Column()
   roles: UserRole;
+
+  @OneToMany(() => Appointment, (appointment) => appointment.user)
+  appointments: Appointment[];
 
   @CreateDateColumn()
   created_at: Date;

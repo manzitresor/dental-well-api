@@ -1,9 +1,12 @@
+import { User } from 'src/users/entities/user.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 
 @Entity('appointments')
@@ -25,6 +28,10 @@ export class Appointment {
 
   @Column()
   status: string;
+
+  @ManyToOne(() => User, (user) => user.appointments, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'userId' })
+  user: User;
 
   @CreateDateColumn()
   createdAt: Date;
