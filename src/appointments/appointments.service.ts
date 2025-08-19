@@ -1,26 +1,37 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
-import { UpdateAppointmentDto } from './dto/update-appointment.dto';
+import { Appointment } from './entities/appointment.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { AppointmentStatus } from 'src/util/appointment.enum';
 
 @Injectable()
 export class AppointmentsService {
-  create(createAppointmentDto: CreateAppointmentDto) {
-    return 'This action adds a new appointment';
-  }
+  constructor(
+    @InjectRepository(Appointment)
+    private appointmentRepository: Repository<Appointment>,
+  ) {}
+  async create(
+    userId: string,
+    createAppointmentDto: CreateAppointmentDto,
+  ): Promise<Appointment> {
+    const existingAppointment = await this.appointmentRepository.findOne({
+      where: {
+        date: createAppointmentDto.date,
+        time: createAppointmentDto.time,
+        status: AppointmentStatus.CONFIRMED,
+      },
+    });
 
-  findAll() {
-    return `This action returns all appointments`;
-  }
+    if (existingAppointment) {
+      throw new ConflictException('This time slot is already booked');
+    }
 
-  findOne(id: number) {
-    return `This action returns a #${id} appointment`;
-  }
-
-  update(id: number, updateAppointmentDto: UpdateAppointmentDto) {
-    return `This action updates a #${id} appointment`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} appointment`;
+    const appointment = this.appointmentRepository.create({
+      ...createAppointmentDto,
+      user: { id: userId },
+      status: AppointmentStatus.PENDING,
+    });
+    return await this.appointmentRepository.save(appointment);
   }
 }
