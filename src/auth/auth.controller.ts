@@ -36,7 +36,6 @@ export class AuthController {
     return this.authService.login(loginRequest);
   }
 
-  @ApiTags('Authentication')
   @Post('register')
   @ApiOperation({ summary: 'User registration' })
   @ApiBody({ type: CreateUserDto })
