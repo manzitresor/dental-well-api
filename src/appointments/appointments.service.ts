@@ -34,4 +34,15 @@ export class AppointmentsService {
     });
     return await this.appointmentRepository.save(appointment);
   }
+
+  async findAll(userId?: string): Promise<Appointment[]> {
+    return await this.appointmentRepository.find({
+      where: userId ? { user: { id: userId } } : {},
+      relations: ['user'],
+      order: {
+        date: 'ASC',
+        time: 'ASC',
+      },
+    });
+  }
 }
