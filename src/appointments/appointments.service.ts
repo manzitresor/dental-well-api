@@ -27,10 +27,11 @@ export class AppointmentsService {
       throw new ConflictException('This time slot is already booked');
     }
 
+    const status = createAppointmentDto.status || AppointmentStatus.PENDING;
     const appointment = this.appointmentRepository.create({
       ...createAppointmentDto,
       user: { id: userId },
-      status: AppointmentStatus.PENDING,
+      status,
     });
     return await this.appointmentRepository.save(appointment);
   }
@@ -39,10 +40,6 @@ export class AppointmentsService {
     return await this.appointmentRepository.find({
       where: userId ? { user: { id: userId } } : {},
       relations: ['user'],
-      order: {
-        date: 'ASC',
-        time: 'ASC',
-      },
     });
   }
 }
